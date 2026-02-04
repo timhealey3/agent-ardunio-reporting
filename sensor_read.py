@@ -1,4 +1,10 @@
 import sqlite3
+import serial
+import time
+
+ARDUINO_FAILED_CONNECT = "Failed to connect to the arduino"
+
+
 '''
 fetch data from Arduino board every 5 minutes, filling out a database
 '''
@@ -23,7 +29,15 @@ CREATE TABLE IF NOT EXISTS temps (
     conn.close()
 
 def getTemp():
-    return 50.50
+    try:
+        # Change to your actual port
+        arduino = serial.Serial(port='/dev/tty.usbmodem1101', baudrate=9600, timeout=1)
+        time.sleep(2) 
+        data = arduino.readline().decode('utf-8').strip()
+        arduino.close()
+        return data
+    except:
+        raise ConnectionError(ARDUINO_FAILED_CONNECT)
 
 if __name__ == "__main__":
     main()
